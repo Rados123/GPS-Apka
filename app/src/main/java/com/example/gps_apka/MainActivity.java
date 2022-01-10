@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode) {
-            case PERMISSIONS_FINE_LOCATION:;
+            case PERMISSIONS_FINE_LOCATION:
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 updateGPS();
             } else {
@@ -220,16 +220,16 @@ public class MainActivity extends AppCompatActivity {
     private void updateUIValues(Location location) {
         // aktualizujemy tekst view
         tv_lat.setText(String.valueOf(location.getLatitude()));
-        tv_lon.setText(String.valueOf(location.getLatitude()));
-        tv_accuracy.setText(String.valueOf(location.getLatitude()));
+        tv_lon.setText(String.valueOf(location.getLongitude()));
+        tv_accuracy.setText(String.valueOf(location.getAccuracy()));
         //nie wszystkie telefony moga pokazywac wysokosc, szybkosc
         if (location.hasAltitude()) {
-            tv_altitude.setText(String.valueOf(location.getLatitude()));
+            tv_altitude.setText(String.valueOf(location.getAltitude()));
         } else {
             tv_altitude.setText("Nie dostępne w tym modelu telefonu");
         }
-        if (location.hasAltitude()) {
-            tv_speed.setText(String.valueOf(location.getLatitude()));
+        if (location.hasSpeed()) {
+            tv_speed.setText(String.valueOf(location.getSpeed()));
         } else {
             tv_speed.setText("Nie dostępne w tym modelu telefonu");
         }
