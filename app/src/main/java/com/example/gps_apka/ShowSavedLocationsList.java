@@ -23,7 +23,8 @@ public class ShowSavedLocationsList extends AppCompatActivity {
         MyApplication myApplication = (MyApplication)getApplicationContext();
         List<Location> savedLocations = myApplication.getMyLocations();
 
+        //lv_savedlocations.setAdapter(new ArrayAdapter<Location>(this, android.R.layout.simple_list_item_1,  ));
         //pobiera i uklada zapisane lokalizacje
-        lv_savedlocations.setAdapter(new ArrayAdapter<Location>( this, android.R.layout.simple_list_item_1, savedLocations));
+        lv_savedlocations.setAdapter(new ArrayAdapter<Location>(this, android.R.layout.simple_list_item_1, savedLocations));
     }
 }
