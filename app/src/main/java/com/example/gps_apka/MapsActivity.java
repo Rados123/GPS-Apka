@@ -2,6 +2,8 @@ package com.example.gps_apka;
 
 import androidx.fragment.app.FragmentActivity;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -63,7 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(latLng);
-                markerOptions.title("Szerokość:" + location.getLatitude() +" Długość:" + location.getLongitude() + " Adres:");
+                markerOptions.title("Szerokość:" + location.getLatitude() +" Długość:" + location.getLongitude());
                 mMap.addMarker(markerOptions);
                 lastLocationListed = latLng;
         }

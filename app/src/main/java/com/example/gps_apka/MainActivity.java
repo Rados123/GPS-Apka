@@ -1,4 +1,4 @@
-//do dodania, ładne wyświetlanie listy, wyświetlanie adresu na mapie przez geocoder, i przycisk nwwWayPoint do zmodyfikowania aby tylko zapisywał lokalizacje.
+//do dodania, wyświetlanie listy, wyświetlanie adresu na mapie przez geocoder, i przycisk nwwWayPoint do zmodyfikowania aby tylko zapisywał lokalizacje.
 
 package com.example.gps_apka;
 
@@ -14,10 +14,12 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
+import androidx.core.content.ContextCompat;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -31,17 +33,13 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int DEFAULT_UPDATE_INTERVAL = 30;
-    public static final int FASTEST_UPDATE_INTERVAL = 5;
+    public static final int DEFAULT_UPDATE_INTERVAL = 3;
+    public static final int FASTEST_UPDATE_INTERVAL = 1;
     private static final int PERMISSIONS_FINE_LOCATION = 99;
     //powiazanie UI
     TextView tv_lat, tv_lon, tv_altitude, tv_accuracy, tv_speed, tv_sensor, tv_updates, tv_address, tv_countofCrumbs;
     Button btn_newWayPoint, btn_shwoWayPoint, btn_showmap;
     Switch sw_locationsupdates, sw_gps;
-
-
-    //zmienna ktora sprawdza czy sledzimy
-    boolean updateON = false;
 
     //plik konfiguracyjny dla API google
     LocationRequest locationrequest;
@@ -54,9 +52,6 @@ public class MainActivity extends AppCompatActivity {
 
     //API googla na tym sie wszystko opiera
     FusedLocationProviderClient fusedLocationProviderClient;
-
-
-
 
 
     @Override
@@ -82,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // kofiguracja locationrequest
-        locationrequest = new LocationRequest();
+        LocationRequest locationrequest = LocationRequest.create();
         //jak często sprawdza lokacje, wycaigamy mnożnik do zmiennej do gory żeby łatwo zmienic
         locationrequest.setInterval(1000 * DEFAULT_UPDATE_INTERVAL);
         //jak czesto sprawdza lokacje na najwyzszym wykorzystaniu aplikacji
@@ -103,9 +98,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //dostajemy lokalizację GPS
                 //dodajemy do zapisanej listy, wymagana zmiana w manifeście
-                MyApplication myApplication = (MyApplication)getApplicationContext();
+                MyApplication myApplication = (MyApplication) getApplicationContext();
                 savedLocations = myApplication.getMyLocations();
                 savedLocations.add(currentLocation);
+                if (savedLocations != null) {
+                    tv_countofCrumbs.setText(Integer.toString(savedLocations.size()));
+                }
             }
         });
 
@@ -158,22 +156,23 @@ public class MainActivity extends AppCompatActivity {
     } //koniec metody on create
 
     private void stopLocationUpdates() {
-        tv_updates.setText("Lokacja jest aktualizowana na bieżąco");
+        tv_updates.setText("Lokacja nie jest aktualizowana na bieżąco");
         tv_lat.setText("Brak danych");
         tv_lon.setText("Brak danych");
         tv_speed.setText("Brak danych");
         tv_address.setText("Brak danych");
         tv_accuracy.setText("Brak danych");
         tv_altitude.setText("Brak danych");
-        tv_sensor.setText("Brak danych");
+        //tv_sensor.setText("Brak danych");
 
         fusedLocationProviderClient.removeLocationUpdates(locationCallBack);
     }
 
     private void startLocationUpdates() {
 
-        tv_updates.setText("Lokacja nie jest aktualizowana na bieżąco");
-        fusedLocationProviderClient.requestLocationUpdates(locationrequest, locationCallBack,null);
+        tv_updates.setText("Lokacja jest aktualizowana na bieżąco");
+
+        fusedLocationProviderClient.requestLocationUpdates(locationrequest, locationCallBack, null);
         updateGPS();
     }
 
@@ -184,13 +183,13 @@ public class MainActivity extends AppCompatActivity {
 
         switch (requestCode) {
             case PERMISSIONS_FINE_LOCATION:
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                updateGPS();
-            } else {
-                Toast.makeText(this, "Wymagane jest udzielenie zgody aby aplikacja działałą", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-            break;
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    updateGPS();
+                } else {
+                    Toast.makeText(this, "Wymagane jest udzielenie zgody aby aplikacja działałą", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                break;
         }
     }
 
@@ -204,15 +203,17 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 //pokazanie lokalizacji
                 public void onSuccess(Location location) {
-                    //skoro dostalismy zgode to pobieramy lokalizacje i ja wysylamy do metody updateUIValues i do zmiennej currentlocation
-                    updateUIValues(location);
-                    currentLocation = location;
+                    if (location != null) {
+                        //skoro dostalismy zgode to pobieramy lokalizacje i ja wysylamy do metody updateUIValues i do zmiennej currentlocation
+                        updateUIValues(location);
+                        currentLocation = location;
+                    }
                 }
             });
         } else {
             // nie mamy zgody, sprawdzamy wersje androida
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_FINE_LOCATION);
+                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_FINE_LOCATION);
         }
 
     }
@@ -246,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
         MyApplication myApplication = (MyApplication)getApplicationContext();
         savedLocations = myApplication.getMyLocations();
         //pokaz liste lokalizacji
-        tv_countofCrumbs.setText(Integer.toString( savedLocations.size()));
+        //tv_countofCrumbs.setText(Integer.toString( savedLocations.size()));
 
     }
 
