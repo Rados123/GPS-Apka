@@ -127,10 +127,10 @@ public class MainActivity extends AppCompatActivity {
                 if (sw_gps.isChecked()) {
                     //zwiekszamy pobor pradu i dokladnosc GPS
                     locationrequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                    tv_sensor.setText("Wykrywania lokalizacji przez GPS");
+                    tv_sensor.setText("GPS");
                 } else {
                     locationrequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-                    tv_sensor.setText("Wykrywanie lokalizacji przez Sieć komórkową i Wi-Fi");
+                    tv_sensor.setText("Sieć komórkowa i Wi-Fi");
                 }
             }
         });

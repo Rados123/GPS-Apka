@@ -6,8 +6,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 
@@ -15,7 +13,6 @@ import java.io.IOException;
 import java.util.List;
 
 public class ShowSavedLocationsList extends AppCompatActivity {
-    ListView lv_savedlocations;
     TextView tv_savedlocations;
     List<Location> savedLocations;
 
@@ -24,9 +21,6 @@ public class ShowSavedLocationsList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_saved_locations_list);
         tv_savedlocations = findViewById(R.id.tv_savedlocations);
-
-        lv_savedlocations = findViewById(R.id.lv_savedLocations);
-
         MyApplication myApplication = (MyApplication)getApplicationContext();
         savedLocations = myApplication.getMyLocations();
 
@@ -35,7 +29,7 @@ public class ShowSavedLocationsList extends AppCompatActivity {
         try {
             for(Location location: savedLocations){
                 List<Address> addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
-                String locale = "Szerokość:" + location.getLatitude() +" Długość:" + location.getLongitude() + " Dokładność: " + location.getAccuracy() + " Adres: " + addresses.get(0).getAddressLine(0);
+                String locale = "Odwiedzona lokalizacja miała następujące współrzędne: \n" + "Szerokość:" + location.getLatitude() +" Długość:" + location.getLongitude() + " Dokładność: " + location.getAccuracy() + "\nAdres: " + addresses.get(0).getAddressLine(0);
                 //tv_savedlocations.setText(("Szerokość:" + location.getLatitude() +" Długość:" + location.getLongitude()));
                 finalstring = finalstring + locale + "\n\n";
             }
@@ -78,7 +72,6 @@ public class ShowSavedLocationsList extends AppCompatActivity {
         }
  */
         //pobiera i uklada zapisane lokalizacje
-        //lv_savedlocations.setAdapter(new ArrayAdapter<Location>(this, android.R.layout.simple_list_item_1, savedLocations));
 
     }
 }
