@@ -1,5 +1,3 @@
-//do dodania, wyświetlanie listy, wyświetlanie adresu na mapie przez geocoder, i przycisk nwwWayPoint do zmodyfikowania aby tylko zapisywał lokalizacje.
-
 package com.example.gps_apka;
 
 import androidx.annotation.NonNull;
@@ -33,9 +31,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int DEFAULT_UPDATE_INTERVAL = 3;
+    public static final int DEFAULT_UPDATE_INTERVAL = 10;
     public static final int FASTEST_UPDATE_INTERVAL = 1;
-    private static final int PERMISSIONS_FINE_LOCATION = 99;
+    private static final int PERMISSIONS_FINE_LOCATION = 321;
     //powiazanie UI
     TextView tv_lat, tv_lon, tv_altitude, tv_accuracy, tv_speed, tv_sensor, tv_updates, tv_address, tv_countofCrumbs;
     Button btn_newWayPoint, btn_shwoWayPoint, btn_showmap;
@@ -247,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
         MyApplication myApplication = (MyApplication)getApplicationContext();
         savedLocations = myApplication.getMyLocations();
         //pokaz liste lokalizacji
-        //tv_countofCrumbs.setText(Integer.toString( savedLocations.size()));
+        tv_countofCrumbs.setText(Integer.toString( savedLocations.size()));
 
     }
 

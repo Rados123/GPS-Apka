@@ -60,8 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         LatLng lastLocationListed = sydney;
 
-        for (Location location: savedLocations
-             ) {
+        for (Location location: savedLocations) {
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(latLng);
