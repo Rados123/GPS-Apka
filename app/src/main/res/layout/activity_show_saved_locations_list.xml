@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ShowSavedLocationsList">
+    tools:context=".ShowSavedLocationsList"
+    android:background="@drawable/sky_background">
+
 
     <TextView
         android:id="@+id/tv_savedlocations"
@@ -13,6 +15,8 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:text="TextView"
+        android:textColor="@color/teal_200"
+        android:scrollbars="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

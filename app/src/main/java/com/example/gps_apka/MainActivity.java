@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -12,12 +13,9 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
-import androidx.core.content.ContextCompat;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -25,15 +23,14 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final int DEFAULT_UPDATE_INTERVAL = 10;
-    public static final int FASTEST_UPDATE_INTERVAL = 1;
-    private static final int PERMISSIONS_FINE_LOCATION = 321;
+    public static final int FASTEST_UPDATE_INTERVAL = 3;
+    private static final int PERMISSIONS_FINE_LOCATION = 99;
     //powiazanie UI
     TextView tv_lat, tv_lon, tv_altitude, tv_accuracy, tv_speed, tv_sensor, tv_updates, tv_address, tv_countofCrumbs;
     Button btn_newWayPoint, btn_shwoWayPoint, btn_showmap;
@@ -52,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     FusedLocationProviderClient fusedLocationProviderClient;
 
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,10 +67,8 @@ public class MainActivity extends AppCompatActivity {
         sw_locationsupdates = findViewById(R.id.sw_locationsupdates);
         btn_newWayPoint = findViewById(R.id.btn_newWayPoint);
         btn_shwoWayPoint = findViewById(R.id.btn_shwoWayPoint);
-        //tv_labelCrumb = findViewById(R.id.tv_labelCrumb);
         tv_countofCrumbs = findViewById(R.id.tv_countofCrumbs);
         btn_showmap = findViewById(R.id.btn_showmap);
-
 
         // kofiguracja locationrequest
         LocationRequest locationrequest = LocationRequest.create();
@@ -84,68 +80,59 @@ public class MainActivity extends AppCompatActivity {
 
         locationCallBack = new LocationCallback() {
             @Override
-            public void onLocationResult(@NonNull LocationResult locationResult) {
-                super.onLocationResult(locationResult);
+            public void onLocationResult(LocationResult locationResult) {
+                //super.onLocationResult(locationResult);
+                if (locationrequest == null) {
+                    return;
+                }
                 //zapisanie lokalizacji
-                updateUIValues(locationResult.getLastLocation());
+                //updateUIValues(locationResult.getLastLocation());
+                for (Location location: locationResult.getLocations()) {
+                    updateUIValues(location);
+                }
             }
         };
 
-        btn_newWayPoint.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //dostajemy lokalizację GPS
-                //dodajemy do zapisanej listy, wymagana zmiana w manifeście
-                MyApplication myApplication = (MyApplication) getApplicationContext();
-                savedLocations = myApplication.getMyLocations();
-                savedLocations.add(currentLocation);
-                if (savedLocations != null) {
-                    tv_countofCrumbs.setText(Integer.toString(savedLocations.size()));
-                }
+        btn_newWayPoint.setOnClickListener(view -> {
+            //dostajemy lokalizację GPS
+            //dodajemy do zapisanej listy, wymagana zmiana w manifeście
+            MyApplication myApplication = (MyApplication) getApplicationContext();
+            savedLocations = myApplication.getMyLocations();
+            savedLocations.add(currentLocation);
+            if (savedLocations != null) {
+                tv_countofCrumbs.setText(Integer.toString(savedLocations.size()));
             }
         });
 
-        btn_shwoWayPoint.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, ShowSavedLocationsList.class);
-                startActivity(i);
+        btn_shwoWayPoint.setOnClickListener(view -> {
+            Intent i = new Intent(MainActivity.this, ShowSavedLocationsList.class);
+            startActivity(i);
+        });
+
+        btn_showmap.setOnClickListener(view -> {
+            Intent i = new Intent(MainActivity.this, MapsActivity.class);
+            startActivity(i);
+        });
+
+        sw_gps.setOnClickListener(view -> {
+            if (sw_gps.isChecked()) {
+                //zwiekszamy pobor pradu i dokladnosc GPS
+                locationrequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                tv_sensor.setText("GPS");
+            } else {
+                locationrequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+                tv_sensor.setText("Sieć komórkowa i Wi-Fi");
             }
         });
 
-        btn_showmap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, MapsActivity.class);
-                startActivity(i);
-            }
-        });
+        //tworzymy 2 odrebne metody do
+        sw_locationsupdates.setOnClickListener(view -> {
+            if (sw_locationsupdates.isChecked()) {
+                startLocationUpdates();
 
-        sw_gps.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (sw_gps.isChecked()) {
-                    //zwiekszamy pobor pradu i dokladnosc GPS
-                    locationrequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                    tv_sensor.setText("GPS");
-                } else {
-                    locationrequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-                    tv_sensor.setText("Sieć komórkowa i Wi-Fi");
-                }
-            }
-        });
+            } else {
+                stopLocationUpdates();
 
-        sw_locationsupdates.setOnClickListener(new View.OnClickListener() {
-            //tworzymy 2 odrebne metody do
-            @Override
-            public void onClick(View view) {
-                if (sw_locationsupdates.isChecked()) {
-                    startLocationUpdates();
-
-                } else {
-                    stopLocationUpdates();
-
-                }
             }
         });
 
@@ -170,8 +157,15 @@ public class MainActivity extends AppCompatActivity {
 
         tv_updates.setText("Lokacja jest aktualizowana na bieżąco");
 
-        fusedLocationProviderClient.requestLocationUpdates(locationrequest, locationCallBack, null);
-        updateGPS();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_FINE_LOCATION);
+        } else {
+            fusedLocationProviderClient.requestLocationUpdates(locationrequest, locationCallBack,null );
+            updateGPS();
+
+        }
+        //fusedLocationProviderClient.requestLocationUpdates(locationrequest, locationCallBack, null);
+        //updateGPS();
     }
 
     //metoda
@@ -197,27 +191,27 @@ public class MainActivity extends AppCompatActivity {
         //uzyskanie pozwolen od uzytkownika
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             //zgoda wyrazona przez usera
-            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                @Override
-                //pokazanie lokalizacji
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        //skoro dostalismy zgode to pobieramy lokalizacje i ja wysylamy do metody updateUIValues i do zmiennej currentlocation
-                        updateUIValues(location);
-                        currentLocation = location;
-                    }
+            //pokazanie lokalizacji
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, location -> {
+                if (location != null) {
+                    //skoro dostalismy zgode to pobieramy lokalizacje i ja wysylamy do metody updateUIValues i do zmiennej currentlocation
+                    currentLocation = location;
+                    updateUIValues(location);
                 }
             });
         } else {
             // nie mamy zgody, sprawdzamy wersje androida
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_FINE_LOCATION);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions( new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_FINE_LOCATION);
+            }
         }
 
     }
     //przekazanie informacji do UI
+    @SuppressLint("SetTextI18n")
     private void updateUIValues(Location location) {
         // aktualizujemy tekst view
+        //currentLocation = location;
         tv_lat.setText(String.valueOf(location.getLatitude()));
         tv_lon.setText(String.valueOf(location.getLongitude()));
         tv_accuracy.setText(String.valueOf(location.getAccuracy()));

@@ -6,10 +6,10 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.widget.TextView;
 
 
-import java.io.IOException;
 import java.util.List;
 
 public class ShowSavedLocationsList extends AppCompatActivity {
@@ -41,6 +41,7 @@ public class ShowSavedLocationsList extends AppCompatActivity {
             }
         }
         tv_savedlocations.setText(finalstring);
+        tv_savedlocations.setMovementMethod(new ScrollingMovementMethod());
 /*
         for(Location location: savedLocations){
                 String locale = "Szerokość:" + location.getLatitude() +" Długość:" + location.getLongitude();

@@ -2,8 +2,6 @@ package com.example.gps_apka;
 
 import androidx.fragment.app.FragmentActivity;
 
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 
